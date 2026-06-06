@@ -1,0 +1,13 @@
+usage_date_utc,model,workspace,api_key,usage_type,context_window,token_type,cost_usd,cost_type,inference_geo,speed
+2026-02-17,Claude Sonnet 4,Default,CC,message,≤ 200k,input_no_cache,4.22,token,not_available,
+2026-02-17,Claude Sonnet 4,Default,CC,message,≤ 200k,output,0.24,token,not_available,
+2026-02-19,Claude Sonnet 4,Default,CC,message,≤ 200k,input_no_cache,8.52,token,not_available,
+2026-02-19,Claude Sonnet 4,Default,CC,message,≤ 200k,output,0.18,token,not_available,
+2026-02-20,Claude Sonnet 4,Default,CC,message,≤ 200k,input_no_cache,10.42,token,not_available,
+2026-02-20,Claude Sonnet 4,Default,CC,message,≤ 200k,output,0.15,token,not_available,
+2026-02-21,Claude Sonnet 4,Default,CC,message,≤ 200k,input_no_cache,8.11,token,not_available,
+2026-02-21,Claude Sonnet 4,Default,CC,message,≤ 200k,output,0.21,token,not_available,
+2026-02-22,Claude Sonnet 4,Default,the_mirror_remembers_itself,message,≤ 200k,input_no_cache,1.02,token,not_available,
+2026-02-22,Claude Sonnet 4,Default,the_mirror_remembers_itself,message,≤ 200k,output,0.27,token,not_available,
+2026-02-23,Claude Sonnet 4,Default,the_mirror_remembers_itself,message,≤ 200k,input_no_cache,0.04,token,not_available,
+2026-02-23,Claude Sonnet 4,Default,the_mirror_remembers_itself,message,≤ 200k,output,0.01,token,not_available,

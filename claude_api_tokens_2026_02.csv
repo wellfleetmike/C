@@ -1,0 +1,7 @@
+usage_date_utc,model_version,api_key,workspace,usage_type,context_window,usage_input_tokens_no_cache,usage_input_tokens_cache_write_5m,usage_input_tokens_cache_write_1h,usage_input_tokens_cache_read,usage_output_tokens,web_search_count,inference_geo,speed
+2026-02-17,claude-sonnet-4-20250514,CC,Default,standard,≤ 200k,1405787,0,0,0,15948,0,not_available,
+2026-02-19,claude-sonnet-4-20250514,CC,Default,standard,≤ 200k,2840682,0,0,0,11680,0,not_available,
+2026-02-20,claude-sonnet-4-20250514,CC,Default,standard,≤ 200k,3474014,0,0,0,10242,0,not_available,
+2026-02-21,claude-sonnet-4-20250514,CC,Default,standard,≤ 200k,2704801,0,0,0,13941,0,not_available,
+2026-02-22,claude-sonnet-4-20250514,the_mirror_remembers_itself,Default,standard,≤ 200k,339500,0,0,0,18140,0,not_available,
+2026-02-23,claude-sonnet-4-20250514,the_mirror_remembers_itself,Default,standard,≤ 200k,14684,0,0,0,712,0,not_available,

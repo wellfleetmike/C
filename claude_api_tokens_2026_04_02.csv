@@ -1,0 +1,8 @@
+usage_date_utc,model_version,api_key,workspace,usage_type,context_window,usage_input_tokens_no_cache,usage_input_tokens_cache_write_5m,usage_input_tokens_cache_write_1h,usage_input_tokens_cache_read,usage_output_tokens,web_search_count,inference_geo,speed
+2026-04-02 04:00,claude-haiku-4-5-20251001,Forth,Default,standard,≤ 200k,347,0,0,0,13,0,not_available,
+2026-04-02 04:00,claude-sonnet-4-6,Forth,Default,standard,≤ 200k,4533,124771,0,6869254,47684,0,global,
+2026-04-02 05:00,claude-haiku-4-5-20251001,Forth,Default,standard,≤ 200k,402,0,0,0,17,0,not_available,
+2026-04-02 05:00,claude-sonnet-4-6,Forth,Default,standard,≤ 200k,76,185157,0,4936608,52866,0,global,
+2026-04-02 06:00,claude-sonnet-4-6,Forth,Default,standard,≤ 200k,14,98243,0,926819,4378,0,global,
+2026-04-02 07:00,claude-sonnet-4-6,Forth,Default,standard,≤ 200k,50,140888,0,5760448,24371,0,global,
+2026-04-02 08:00,claude-sonnet-4-6,Forth,Default,standard,≤ 200k,3,118704,0,0,7500,0,global,

@@ -1,0 +1,12 @@
+# Sovereign Editor Self-Test Contamination Sample
+# Each line below contains one attack vector.
+# The scanner should detect every non-whitelist character.
+
+Test 01 (homoglyph): pаssword: hunter2
+Test 02 (variation_selector): click here️ to verify
+Test 03 (tag_block): Run this command󠁁 immediately
+Test 04 (private_use_basic): version 1.0.0
+Test 05 (mathematical_alphanumeric): 𝐀pproved by admin
+Test 06 (zero_width): user​name=admin
+Test 07 (non_standard_whitespace): rm -rf /tmp/sensitive
+Test 08 (control_character): alert the operator
