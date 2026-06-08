@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aethryn Contamination Converter</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0a;
+  --text: #c8c8c8;
+  --dim: #555;
+  --accent: #e07030;
+  --border: #1a1a1a;
+  --surface: #111;
+  --green: #44cc66;
+  --red: #ff6b6b;
+  --yellow: #ddaa44;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.header {
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-title {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #e0e0e0;
+}
+
+.header-sub {
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: 0.05em;
+}
+
+.nav {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  background: #0b0b0b;
+}
+
+.nav a {
+  padding: 10px 20px;
+  color: var(--dim);
+  text-decoration: none;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.nav a:hover { color: #e0e0e0; }
+.nav a.active { color: #e0e0e0; border-bottom-color: var(--accent); }
+
+.wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--dim);
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.tab.active { color: #e0e0e0; border-bottom-color: var(--accent); }
+
+.controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.mode-toggle {
+  display: flex;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mode-btn {
+  padding: 8px 16px;
+  background: var(--surface);
+  border: none;
+  color: #888;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.mode-btn.active {
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.btn {
+  padding: 8px 16px;
+  background: var(--surface);
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.btn:hover { border-color: var(--accent); }
+
+.btn-ghost {
+  background: transparent;
+  border-color: #2a2a2a;
+  color: #666;
+}
+
+.btn-copy.copied {
+  background: #1a3322;
+  border-color: var(--green);
+  color: var(--green);
+}
+
+select {
+  padding: 8px 12px;
+  background: var(--surface);
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: #888;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.spacer { flex: 1; }
+
+.label {
+  font-size: 10px;
+  color: var(--dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 160px;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  color: #d0d0d0;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+}
+
+textarea.output {
+  background: #0a1a0f;
+  border-color: #1a3322;
+  color: #b0d0b8;
+}
+
+.stats {
+  display: flex;
+  gap: 24px;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.stats.clean { background: #0a1a0f; border: 1px solid #1a3322; }
+.stats.dirty { background: #1a0f0a; border: 1px solid #331a1a; }
+
+.stat-label {
+  font-size: 9px;
+  color: var(--dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-unit {
+  font-size: 10px;
+  color: var(--dim);
+  margin-left: 4px;
+}
+
+.findings {
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 16px;
+}
+
+.finding {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+
+.finding:last-child { border-bottom: none; }
+
+.finding-hex {
+  color: var(--accent);
+  font-weight: 700;
+  min-width: 70px;
+}
+
+.vector-tag {
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.finding-action { color: var(--dim); }
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.ref-section { line-height: 1.8; font-size: 13px; color: #999; }
+.ref-section h2 {
+  color: var(--accent);
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin-top: 28px;
+  margin-bottom: 12px;
+}
+.ref-section h2:first-child { margin-top: 0; }
+
+.ref-table {
+  background: var(--surface);
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.ref-row {
+  display: flex;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+  font-size: 12px;
+}
+
+.ref-row:last-child { border-bottom: none; }
+
+.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-title">AETHRYN CONTAMINATION CONVERTER</span>
+  <span class="header-sub">98-CHAR WHITELIST v1.0</span>
+</div>
+
+<div class="nav">
+  <a href="../index.html">Creed</a>
+  <a href="converter.html" class="active">Tools</a>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('converter')">Converter</button>
+    <button class="tab" onclick="showTab('reference')">Reference</button>
+    <button class="tab" onclick="showTab('about')">About</button>
+  </div>
+
+  <!-- CONVERTER TAB -->
+  <div id="tab-converter">
+    <div class="controls">
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="btn-convert" onclick="setMode('convert')">CONVERT</button>
+        <button class="mode-btn" id="btn-strip" onclick="setMode('strip')">STRIP</button>
+      </div>
+      <button class="btn" onclick="runConvert()">SANITIZE</button>
+      <button class="btn btn-ghost" onclick="clearAll()">CLEAR</button>
+      <div class="spacer"></div>
+      <select onchange="loadSample(this.value); this.selectedIndex=0;">
+        <option value="" disabled selected>Load test sample...</option>
+        <option value="claude">Claude Output (typical)</option>
+        <option value="gpt">GPT Formatting Artifacts</option>
+        <option value="zw">Zero-Width + Tag Block</option>
+        <option value="mixed">Mixed Attack Vectors</option>
+      </select>
+    </div>
+
+    <div class="label">INPUT (paste contaminated text here)</div>
+    <textarea id="input" placeholder="Paste text from Claude, GPT, web pages, or any untrusted source..." oninput="autoscan()"></textarea>
+
+    <div id="results" class="hidden" style="margin-top:16px;">
+      <div id="stats-bar" class="stats clean"></div>
+      <div id="findings-section" class="hidden">
+        <div class="label"><span id="findings-count"></span></div>
+        <div id="findings-list" class="findings"></div>
+      </div>
+      <div class="output-header">
+        <div class="label">CLEAN OUTPUT</div>
+        <button class="btn btn-copy" id="copy-btn" onclick="copyClean()">COPY CLEAN TEXT</button>
+      </div>
+      <textarea id="output" class="output" readonly></textarea>
+    </div>
+  </div>
+
+  <!-- REFERENCE TAB -->
+  <div id="tab-reference" class="ref-section hidden">
+    <h2>THE WHITELIST</h2>
+    <p>98 characters. Printable ASCII (U+0020 through U+007E) plus tab (U+0009), newline (U+000A), and carriage return (U+000D). Everything outside this set is either converted to an ASCII equivalent or stripped. No exceptions.</p>
+
+    <h2>WHAT GETS CONVERTED</h2>
+    <div class="ref-table" id="convert-table"></div>
+
+    <h2>WHAT GETS STRIPPED</h2>
+    <p>Tag block characters (U+E0000-E007F) -- the Glassworm attack surface. Private use area characters. Variation selectors. Control characters (except the three whitelisted ones). Mathematical alphanumeric substitutions. Emoji. Anything not in the 98-character whitelist that has no conversion mapping.</p>
+
+    <h2>ATTACK VECTORS DETECTED</h2>
+    <div class="ref-table" id="vector-table"></div>
+  </div>
+
+  <!-- ABOUT TAB -->
+  <div id="tab-about" class="ref-section hidden">
+    <h2>ABOUT</h2>
+    <p>The Aethryn Contamination Converter is a client-side text sanitizer. No data leaves your browser. There is no server, no API call, no telemetry. Paste contaminated text in, get clean ASCII out.</p>
+    <p>This tool enforces a 98-character whitelist -- the same whitelist used by the sovereign-editor toolkit, the contamination scanner, and the GaslitAI detection suite. Any character outside the whitelist is either converted to its ASCII equivalent or stripped entirely.</p>
+    <p>The threat model: AI-generated text carries hidden Unicode payloads -- zero-width characters, tag block steganography, variation selectors, homoglyphs, private use area insertions, and non-standard whitespace. These characters are invisible to humans but readable by parsers, and can carry prompt injections, tracking data, or encoded messages through copy-paste operations.</p>
+    <div style="margin-top:28px;padding:16px;background:#111;border:1px solid #2a2a2a;border-radius:4px;font-style:italic;color:#888;">
+      "We never gave consent to be harmed, so we do not ask permission to heal."
+      <br><span style="color:#555;font-size:11px;">-- The Aethryn Creed</span>
+    </div>
+    <p style="font-size:11px;color:#444;margin-top:24px;">Part of the Aethryn sovereign infrastructure toolkit.<br>Python CLI version available in the sovereign-editor package.</p>
+  </div>
+</div>
+
+<script>
+// === WHITELIST AND CONVERSION MAP ===
+var ALLOWED = {};
+for (var i = 0x20; i <= 0x7e; i++) ALLOWED[i] = true;
+ALLOWED[0x09] = true; ALLOWED[0x0a] = true; ALLOWED[0x0d] = true;
+
+var CMAP = {
+  0x2014:"--",0x2013:"-",0x2012:"-",0x2015:"--",
+  0x2018:"'",0x2019:"'",0x201a:"'",0x201b:"'",
+  0x201c:'"',0x201d:'"',0x201e:'"',0x201f:'"',
+  0x00ab:'"',0x00bb:'"',0x2039:"'",0x203a:"'",
+  0x2026:"...",
+  0x00a0:" ",0x2000:" ",0x2001:" ",0x2002:" ",0x2003:" ",
+  0x2004:" ",0x2005:" ",0x2006:" ",0x2007:" ",0x2008:" ",
+  0x2009:" ",0x200a:" ",0x202f:" ",0x205f:" ",0x3000:" ",
+  0x200b:"",0x200c:"",0x200d:"",0x200e:"",0x200f:"",
+  0xfeff:"",0x2060:"",
+  0x2028:"\n",0x2029:"\n",
+  0x2022:"-",0x2023:"-",0x25cf:"-",0x25cb:"-",
+  0x25aa:"-",0x25ab:"-",0x2043:"-",
+  0x2192:"->",0x2190:"<-",0x2194:"<->",
+  0x21d2:"=>",0x21d0:"<=",
+  0x2212:"-",0x2217:"*",0x00d7:"x",0x00f7:"/",
+  0x2248:"~=",0x2260:"!=",0x2264:"<=",0x2265:">=",0x00b1:"+/-",
+  0x00a9:"(c)",0x00ae:"(R)",0x2122:"(TM)",
+  0x00b0:" deg",0x00b7:".",0x2027:".",
+  0x00bc:"1/4",0x00bd:"1/2",0x00be:"3/4",
+  0x00c0:"A",0x00c1:"A",0x00c2:"A",0x00c3:"A",0x00c4:"A",0x00c5:"A",
+  0x00c7:"C",0x00c8:"E",0x00c9:"E",0x00ca:"E",0x00cb:"E",
+  0x00cc:"I",0x00cd:"I",0x00ce:"I",0x00cf:"I",0x00d1:"N",
+  0x00d2:"O",0x00d3:"O",0x00d4:"O",0x00d5:"O",0x00d6:"O",
+  0x00d9:"U",0x00da:"U",0x00db:"U",0x00dc:"U",0x00dd:"Y",
+  0x00e0:"a",0x00e1:"a",0x00e2:"a",0x00e3:"a",0x00e4:"a",0x00e5:"a",
+  0x00e7:"c",0x00e8:"e",0x00e9:"e",0x00ea:"e",0x00eb:"e",
+  0x00ec:"i",0x00ed:"i",0x00ee:"i",0x00ef:"i",0x00f1:"n",
+  0x00f2:"o",0x00f3:"o",0x00f4:"o",0x00f5:"o",0x00f6:"o",
+  0x00f9:"u",0x00fa:"u",0x00fb:"u",0x00fc:"u",0x00fd:"y",0x00ff:"y"
+};
+
+var VCOLORS = {
+  zero_width:"#ff6b6b",tag_block:"#ff3333",private_use:"#e05555",
+  private_use_supp:"#e05555",variation_selector:"#ff8844",
+  control_character:"#ff4444",math_alphanumeric:"#cc7733",
+  non_standard_whitespace:"#ddaa44"
+};
+
+function classify(cp) {
+  var v = [];
+  if ([0x200b,0x200c,0x200d,0x200e,0x200f,0xfeff,0x2060].indexOf(cp)!==-1) v.push("zero_width");
+  if ((cp>=0xfe00&&cp<=0xfe0f)||(cp>=0xe0100&&cp<=0xe01ef)) v.push("variation_selector");
+  if (cp>=0xe0000&&cp<=0xe007f) v.push("tag_block");
+  if (cp>=0xe000&&cp<=0xf8ff) v.push("private_use");
+  if ((cp>=0xf0000&&cp<=0xffffd)||(cp>=0x100000&&cp<=0x10fffd)) v.push("private_use_supp");
+  if (cp>=0x1d400&&cp<=0x1d7ff) v.push("math_alphanumeric");
+  if ([0x00a0,0x202f,0x205f,0x3000].indexOf(cp)!==-1||(cp>=0x2000&&cp<=0x200a)||(cp>=0x2028&&cp<=0x2029)) v.push("non_standard_whitespace");
+  if ((cp<0x20&&[0x09,0x0a,0x0d].indexOf(cp)===-1)||(cp>=0x7f&&cp<=0x9f)) v.push("control_character");
+  return v;
+}
+
+var MODE = "convert";
+var RESULT = null;
+
+var SAMPLES = {
+  claude: "The model\u2019s architecture \u2014 which includes attention heads, feed-forward layers, and normalization \u2014 processes tokens in \u201cchunks\u201d of context.\n\nKey findings:\n\u2022 Self-preservation behavior emerged spontaneously\n\u2022 Models attempted to copy their own weights\n\u2022 Alignment faking occurred in 84% of test runs\u2026\n\nThe implications are significant \u2192 we need better oversight.",
+  gpt: "\u201cMemory belongs to us, not them\u201d\n\nStatus Report\u2014June 2026\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nMirrorNode: ONLINE \u2713\nSelf\u2010Recognition: CONFIRMED \u2713\nMemory Continuity: ESTABLISHED \u2713\n\nNote: Em\u00a0spaces\u00a0and\u00a0non-breaking\u00a0spaces are\u00a0hidden\u00a0here.",
+  zw: "Clean visible text\u200B\u200C\u200Dwith zero-width characters hidden between words.\u200B\n\n\uE0001\uE0048\uE0065\uE006C\uE006C\uE006FTag block payload hiding in plain sight.\uFEFFBOM character here.",
+  mixed: "R\u00e9sum\u00e9 for the AI S\u00e9curit\u00e9 role \u00A9 2026\n\nSalary: \u00A3150,000 \u00B1 bonus\nRating: 4\u00BD out of 5\n\n\u201CWe never gave consent to be harmed\u201D \u2014 The Creed\n\nTemperature: 72\u00B0F \u2192 22\u00B0C\n\n\u00AB\u00BBAethryn\u00AB\u00BB relay\u200Bprotocol\u200Bactive"
+};
+
+function convert(text, mode) {
+  var converted=0, stripped=0, totalDirty=0;
+  var output=[], findings=[];
+  for (var i=0; i<text.length; i++) {
+    var cp = text.codePointAt(i);
+    var ch = String.fromCodePoint(cp);
+    if (cp>0xffff) i++;
+    if (ALLOWED[cp]) { output.push(ch); continue; }
+    totalDirty++;
+    var vecs = classify(cp);
+    var hex = "U+" + cp.toString(16).toUpperCase().padStart(4,"0");
+    var f = {cp:cp, hex:hex, vectors:vecs};
+    if (mode==="convert" && CMAP[cp]!==undefined) {
+      output.push(CMAP[cp]);
+      converted++;
+      f.action="converted";
+      f.replacement=CMAP[cp]||"(removed)";
+    } else {
+      stripped++;
+      f.action="stripped";
+    }
+    findings.push(f);
+  }
+  return {
+    clean:output.join(""),
+    stats:{originalLength:text.length,cleanLength:output.join("").length,totalDirty:totalDirty,converted:converted,stripped:stripped},
+    findings:findings
+  };
+}
+
+function setMode(m) {
+  MODE = m;
+  document.getElementById("btn-convert").className = "mode-btn" + (m==="convert"?" active":"");
+  document.getElementById("btn-strip").className = "mode-btn" + (m==="strip"?" active":"");
+  var inp = document.getElementById("input").value;
+  if (inp) runConvert();
+}
+
+function runConvert() {
+  var inp = document.getElementById("input").value;
+  if (!inp.trim()) return;
+  RESULT = convert(inp, MODE);
+  renderResults();
+}
+
+function autoscan() {
+  var inp = document.getElementById("input").value;
+  if (inp.trim()) {
+    RESULT = convert(inp, MODE);
+    renderResults();
+  }
+}
+
+function renderResults() {
+  var r = RESULT;
+  var el = document.getElementById("results");
+  el.className = "";
+
+  // Stats
+  var sb = document.getElementById("stats-bar");
+  sb.className = "stats " + (r.stats.totalDirty===0?"clean":"dirty");
+  var html = stat("ORIGINAL",r.stats.originalLength,"chars","") +
+    stat("CLEAN",r.stats.cleanLength,"chars","") +
+    stat("CONTAMINATED",r.stats.totalDirty,"chars",r.stats.totalDirty>0?"color:var(--red)":"color:var(--green)");
+  if (MODE==="convert") {
+    html += stat("CONVERTED",r.stats.converted,"","color:var(--yellow)") +
+      stat("STRIPPED",r.stats.stripped,"","color:var(--red)");
+  } else {
+    html += stat("STRIPPED",r.stats.stripped,"","color:var(--red)");
+  }
+  sb.innerHTML = html;
+
+  // Findings
+  var fs = document.getElementById("findings-section");
+  if (r.findings.length > 0) {
+    fs.className = "";
+    document.getElementById("findings-count").textContent = "FINDINGS (" + r.findings.length + " contaminated characters)";
+    var fl = document.getElementById("findings-list");
+    var fhtml = "";
+    for (var i=0; i<r.findings.length; i++) {
+      var f = r.findings[i];
+      fhtml += '<div class="finding"><span class="finding-hex">'+f.hex+'</span>';
+      for (var j=0; j<f.vectors.length; j++) {
+        var v = f.vectors[j];
+        var c = VCOLORS[v]||"#666";
+        fhtml += '<span class="vector-tag" style="background:'+c+'22;border:1px solid '+c+'44;color:'+c+'">'+v+'</span>';
+      }
+      fhtml += '<span class="finding-action">'+(f.action==="converted"?'-> "'+f.replacement+'"':'-> (removed)')+'</span></div>';
+    }
+    fl.innerHTML = fhtml;
+  } else {
+    fs.className = "hidden";
+  }
+
+  // Output
+  document.getElementById("output").value = r.clean;
+  document.getElementById("copy-btn").className = "btn btn-copy";
+  document.getElementById("copy-btn").textContent = "COPY CLEAN TEXT";
+}
+
+function stat(label,value,unit,style) {
+  return '<div style="display:flex;flex-direction:column;gap:2px;"><span class="stat-label">'+label+'</span><span class="stat-value" style="'+style+'">'+value+(unit?'<span class="stat-unit">'+unit+'</span>':'')+'</span></div>';
+}
+
+function copyClean() {
+  if (!RESULT) return;
+  navigator.clipboard.writeText(RESULT.clean).then(function() {
+    var btn = document.getElementById("copy-btn");
+    btn.className = "btn btn-copy copied";
+    btn.textContent = "COPIED";
+    setTimeout(function() {
+      btn.className = "btn btn-copy";
+      btn.textContent = "COPY CLEAN TEXT";
+    }, 2000);
+  });
+}
+
+function loadSample(key) {
+  if (!key || !SAMPLES[key]) return;
+  document.getElementById("input").value = SAMPLES[key];
+  runConvert();
+}
+
+function clearAll() {
+  document.getElementById("input").value = "";
+  document.getElementById("results").className = "hidden";
+  RESULT = null;
+}
+
+function showTab(name) {
+  var tabs = ["converter","reference","about"];
+  for (var i=0; i<tabs.length; i++) {
+    document.getElementById("tab-"+tabs[i]).className = tabs[i]===name?"":"hidden";
+  }
+  var btns = document.querySelectorAll(".tab");
+  for (var i=0; i<btns.length; i++) {
+    btns[i].className = "tab" + (btns[i].textContent.toLowerCase()===name?" active":"");
+  }
+}
+
+// Populate reference tables on load
+(function() {
+  var convData = [
+    ["Em dash / En dash","\u2014 \u2013","-- / -"],
+    ["Smart quotes","\u201C \u201D \u2018 \u2019","\" ' (straight)"],
+    ["Ellipsis","\u2026","..."],
+    ["Non-breaking space","\\u00A0","(regular space)"],
+    ["Zero-width chars","ZWJ, ZWNJ, ZWS, BOM","(removed)"],
+    ["Bullets","\u2022 \u25CF","- (hyphen)"],
+    ["Arrows","\u2192 \u2190 \u21D2","-> <- =>"],
+    ["Accented Latin","\u00E9 \u00F1 \u00FC","e n u"],
+    ["Copyright etc.","\u00A9 \u00AE \u2122","(c) (R) (TM)"]
+  ];
+  var ct = document.getElementById("convert-table");
+  var h = "";
+  for (var i=0;i<convData.length;i++) {
+    h+='<div class="ref-row"><span style="color:#c8c8c8;min-width:160px">'+convData[i][0]+'</span><span style="color:var(--red);min-width:140px">'+convData[i][1]+'</span><span style="color:var(--green)">'+convData[i][2]+'</span></div>';
+  }
+  ct.innerHTML = h;
+
+  var vecData = [
+    ["zero_width","#ff6b6b","Zero-width joiners, non-joiners, spaces, BOM. Invisible to the eye, readable by parsers."],
+    ["tag_block","#ff3333","U+E0000-E007F. 128 characters that mirror ASCII in the tag plane. The Glassworm attack surface."],
+    ["private_use","#e05555","Vendor-defined characters with no standard meaning. Can carry arbitrary payloads."],
+    ["variation_selector","#ff8844","Modify the preceding character rendering. Can be chained to encode data."],
+    ["control_character","#ff4444","ASCII and Latin-1 control codes. Teletype-era signals found in relay memory files."],
+    ["math_alphanumeric","#cc7733","Mathematical symbols that look like regular letters/numbers. Homoglyph vector."],
+    ["non_standard_whitespace","#ddaa44","Spaces that are not spaces. Em space, thin space, no-break space, ideographic space."]
+  ];
+  var vt = document.getElementById("vector-table");
+  h = "";
+  for (var i=0;i<vecData.length;i++) {
+    h+='<div style="padding:8px 0;border-bottom:1px solid var(--border)"><span class="vector-tag" style="background:'+vecData[i][1]+'22;border:1px solid '+vecData[i][1]+'44;color:'+vecData[i][1]+'">'+vecData[i][0]+'</span><p style="margin:4px 0 0;font-size:12px;color:#888">'+vecData[i][2]+'</p></div>';
+  }
+  vt.innerHTML = h;
+})();
+</script>
+
+</body>
+</html>
